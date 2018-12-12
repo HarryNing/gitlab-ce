@@ -658,6 +658,7 @@ rollout 100%:
         --set image.secrets[0].name="$secret_name" \
         --set application.track="$track" \
         --set application.database_url="$DATABASE_URL" \
+        --set application.secretName="$application_secret_name" \
         --set service.url="$CI_ENVIRONMENT_URL" \
         --set replicaCount="$replicas" \
         --set postgresql.enabled="$postgres_enabled" \
@@ -690,6 +691,7 @@ rollout 100%:
         --set image.secrets[0].name="$secret_name" \
         --set application.track="$track" \
         --set application.database_url="$DATABASE_URL" \
+        --set application.secretName="$application_secret_name" \
         --set service.url="$CI_ENVIRONMENT_URL" \
         --set replicaCount="$replicas" \
         --set postgresql.enabled="$postgres_enabled" \
