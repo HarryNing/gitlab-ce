@@ -1582,6 +1582,14 @@ ActiveRecord::Schema.define(version: 20181218192239) do
     t.index ["project_id"], name: "index_project_features_on_project_id", unique: true, using: :btree
   end
 
+  create_table "project_fetch_statistics", force: :cascade do |t|
+    t.integer "project_id"
+    t.integer "count"
+    t.date "date"
+    t.index ["project_id", "date"], name: "index_project_fetch_statistics_on_project_id_and_date", unique: true, using: :btree
+    t.index ["project_id"], name: "index_project_fetch_statistics_on_project_id", using: :btree
+  end
+
   create_table "project_group_links", force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "group_id", null: false
@@ -2420,6 +2428,7 @@ ActiveRecord::Schema.define(version: 20181218192239) do
   add_foreign_key "project_deploy_tokens", "deploy_tokens", on_delete: :cascade
   add_foreign_key "project_deploy_tokens", "projects", on_delete: :cascade
   add_foreign_key "project_features", "projects", name: "fk_18513d9b92", on_delete: :cascade
+  add_foreign_key "project_fetch_statistics", "projects", on_delete: :cascade
   add_foreign_key "project_group_links", "projects", name: "fk_daa8cee94c", on_delete: :cascade
   add_foreign_key "project_import_data", "projects", name: "fk_ffb9ee3a10", on_delete: :cascade
   add_foreign_key "project_mirror_data", "projects", on_delete: :cascade

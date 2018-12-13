@@ -140,3 +140,4 @@
 - detect_repository_languages
 - repository_cleanup
 - delete_stored_files
+- project_fetch_statistics
