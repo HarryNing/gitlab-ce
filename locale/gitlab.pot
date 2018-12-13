@@ -19,6 +19,9 @@ msgstr ""
 msgid " Status"
 msgstr ""
 
+msgid " or "
+msgstr ""
+
 msgid "%d addition"
 msgid_plural "%d additions"
 msgstr[0] ""
@@ -186,6 +189,9 @@ msgid "+ %{count} more"
 msgstr ""
 
 msgid "+ %{moreCount} more"
+msgstr ""
+
+msgid ", or "
 msgstr ""
 
 msgid "- Runner is active and can process any new jobs"
@@ -6656,7 +6662,7 @@ msgstr ""
 msgid "Third party offers"
 msgstr ""
 
-msgid "This %{viewer} could not be displayed because %{reason}."
+msgid "This %{viewer} could not be displayed because %{reason}. You can %{options} instead."
 msgstr ""
 
 msgid "This GitLab instance does not provide any shared Runners yet. Instance administrators can register shared Runners in the admin area."
@@ -7852,6 +7858,9 @@ msgstr ""
 msgid "https://your-bitbucket-server"
 msgstr ""
 
+msgid "image diff"
+msgstr ""
+
 msgid "import flow"
 msgstr ""
 
@@ -7859,6 +7868,15 @@ msgid "importing"
 msgstr ""
 
 msgid "issue boards"
+msgstr ""
+
+msgid "it is stored externally"
+msgstr ""
+
+msgid "it is stored in LFS"
+msgstr ""
+
+msgid "it is too large"
 msgstr ""
 
 msgid "latest deployment"
@@ -8101,6 +8119,9 @@ msgstr ""
 msgid "remove due date"
 msgstr ""
 
+msgid "rendered diff"
+msgstr ""
+
 msgid "reply"
 msgid_plural "replies"
 msgstr[0] ""
@@ -8110,6 +8131,9 @@ msgid "should be higher than %{access} inherited membership from group %{group_n
 msgstr ""
 
 msgid "source"
+msgstr ""
+
+msgid "source diff"
 msgstr ""
 
 msgid "spendCommand|%{slash_command} will update the sum of the time spent."
@@ -8131,6 +8155,9 @@ msgid "uses Kubernetes clusters to deploy your code!"
 msgstr ""
 
 msgid "view it on GitLab"
+msgstr ""
+
+msgid "view the blob"
 msgstr ""
 
 msgid "with %{additions} additions, %{deletions} deletions."

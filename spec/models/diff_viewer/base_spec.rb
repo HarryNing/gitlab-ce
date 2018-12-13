@@ -141,4 +141,25 @@ describe DiffViewer::Base do
       end
     end
   end
+
+  describe '#render_error_message' do
+    it 'returns nothing when no render_error' do
+      expect(viewer.render_error).to be_nil
+      expect(viewer.render_error_message).to be_nil
+    end
+
+    context 'when render_error error' do
+      before do
+        allow(viewer).to receive(:render_error).and_return(:too_large)
+      end
+
+      it 'returns an error message' do
+        expect(viewer.render_error_message).to include('it is too large')
+      end
+
+      it 'includes a "view the blob" link' do
+        expect(viewer.render_error_message).to include('view the blob')
+      end
+    end
+  end
 end
