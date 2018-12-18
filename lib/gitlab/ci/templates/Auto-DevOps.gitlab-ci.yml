@@ -595,33 +595,35 @@ rollout 100%:
     fi
   }
 
-  # Finds any variables prefixed with `K8S_SECRET_`, and exports them as the
-  # global $K8S_VARIABLES with prefix removed.
-  function extract_prefixed_variables() {
-    prefix="K8S_SECRET_"
-    k8s_variables=$(env | (grep "^${prefix}" || [[ $? == 1 ]]) | sed "s/^${prefix}//")
-
-    export K8S_VARIABLES=$k8s_variables
-  }
-
-  # Its own function so that we can isolate IFS
+  # Extracts variables prefixed with K8S_SECRET_
+  # and creates a Kubernetes secret.
+  #
+  # e.g. if we have the following vars
+  #   K8S_SECRET_A=value1
+  #   K8S_SECRET_B=multi\ word\ value
+  #
+  # Then we get:
+  #   --from-literal K8S_SECRET_A=value1 --from-literal 'K8S_SECRET_B=multi word value'
+  #
+  # NOTE: We set IFS as we need to split by newline so that we can loop through
+  # multi word variables correctly.
   function create_application_secret() {
-    prefix="K8S_SECRET_"
-    k8s_variables=$(env | (grep "^${prefix}" || [[ $? == 1 ]]))
+    bash -c '
+      prefix="K8S_SECRET_"
+      k8s_variables=$(env | (grep "^${prefix}" || [[ $? == 1 ]]))
 
-    local IFS=$(echo -en "\n\b")
-    for k8s_variable in $k8s_variables; do
-      param="${k8s_variable#K8S_SECRET_}"
+      IFS=$(echo -en "\n\b")
+      for k8s_variable in $k8s_variables; do
+        param="${k8s_variable#K8S_SECRET_}"
 
-      fromLiteralArgs+=("--from-literal")
-      fromLiteralArgs+=("${param}")
-    done
+        fromLiteralArgs+=("--from-literal")
+        fromLiteralArgs+=("${param}")
+      done
 
-    # We want fromLiteralArgs to be interpreted as args, so don't quote it!
-    kubectl create secret -n "$KUBE_NAMESPACE" \
-      generic "$application_secret_name" \
-      ${fromLiteralArgs[@]} \
-      -o yaml --dry-run | kubectl replace -n "$KUBE_NAMESPACE" --force -f -
+      kubectl create secret \
+        -n "$KUBE_NAMESPACE" generic "$APPLICATION_SECRET_NAME" ${fromLiteralArgs[@]} -o yaml \
+        --dry-run | kubectl replace -n "$KUBE_NAMESPACE" --force -f -
+    '
   }
 
   function deploy() {
