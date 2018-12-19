@@ -7368,6 +7368,12 @@ msgstr ""
 msgid "Users requesting access to"
 msgstr ""
 
+msgid "Variables"
+msgstr ""
+
+msgid "Variables are applied to environments via the runner. They can be protected by only exposing them to protected branches or tags. You can use variables for passwords, secret keys, or credentials."
+msgstr ""
+
 msgid "Various container registry settings."
 msgstr ""
 
@@ -7708,6 +7714,9 @@ msgid "You have no permissions"
 msgstr ""
 
 msgid "You have reached your project limit"
+msgstr ""
+
+msgid "You may also add variables that are made available to the running application by prepending the variable key with <code>K8S_SECRET_</code>."
 msgstr ""
 
 msgid "You must accept our Terms of Service and privacy policy in order to register an account"
