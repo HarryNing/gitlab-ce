@@ -258,6 +258,44 @@ describe API::Helpers::Pagination do
 
           subject.paginate(resource)
         end
+
+        context 'when resources count is less than TOTAL_COUNT_LIMIT' do
+          before do
+            stub_const("#{described_class}::TOTAL_COUNT_LIMIT", 4)
+          end
+
+          it 'executes only one SELECT COUNT query' do
+            expect { subject.paginate(resource) }.to make_queries_matching(/SELECT COUNT/, 1)
+          end
+        end
+
+        context 'when resources count is more than TOTAL_COUNT_LIMIT' do
+          before do
+            stub_const("#{described_class}::TOTAL_COUNT_LIMIT", 2)
+          end
+
+          it 'executes only one SELECT COUNT query' do
+            expect { subject.paginate(resource) }.to make_queries_matching(/SELECT COUNT/, 1)
+          end
+
+          it 'does not return the X-Total and X-Total-Pages headers' do
+            expect_no_header('X-Total')
+            expect_no_header('X-Total-Pages')
+            expect_header('X-Per-Page', '2')
+            expect_header('X-Page', '1')
+            expect_header('X-Next-Page', '2')
+            expect_header('X-Prev-Page', '')
+
+            expect_header('Link', anything) do |_key, val|
+              expect(val).to include('rel="first"')
+              expect(val).not_to include('rel="last"')
+              expect(val).to include('rel="next"')
+              expect(val).not_to include('rel="prev"')
+            end
+
+            subject.paginate(resource)
+          end
+        end
       end
 
       describe 'second page' do
@@ -346,6 +384,10 @@ describe API::Helpers::Pagination do
 
   def expect_header(*args, &block)
     expect(subject).to receive(:header).with(*args, &block)
+  end
+
+  def expect_no_header(*args, &block)
+    expect(subject).not_to receive(:header).with(*args)
   end
 
   def expect_message(method)

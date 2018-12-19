@@ -3,6 +3,8 @@
 module API
   module Helpers
     module Pagination
+      TOTAL_COUNT_LIMIT = 1000
+
       def paginate(relation)
         strategy = if params[:pagination] == 'keyset' && Feature.enabled?('api_keyset_pagination')
                      KeysetPaginationStrategy
@@ -178,14 +180,43 @@ module API
         end
 
         def paginate(relation)
-          relation = add_default_order(relation)
-
-          relation.page(params[:page]).per(params[:per_page]).tap do |data|
+          paginate_with_limit_optimization(add_default_order(relation)).tap do |data|
             add_pagination_headers(data)
           end
         end
 
         private
+
+        def paginate_with_limit_optimization(relation)
+          pagination_data = relation.page(params[:page]).per(params[:per_page])
+          return pagination_data unless pagination_data.is_a?(ActiveRecord::Relation)
+
+          limited_total_count = total_count_with_limit(relation)
+          if limited_total_count > TOTAL_COUNT_LIMIT
+            pagination_data.without_count
+          else
+            # There's currently no way to manually set @total_count in a clean way:
+            # https://github.com/kaminari/kaminari/blob/c5186f5d9b7f23299d115408e62047447fd3189d/kaminari-activerecord/lib/kaminari/activerecord/active_record_relation_methods.rb#L17-L41
+            pagination_data.tap { |data| data.instance_variable_set(:@total_count, limited_total_count) }
+          end
+        end
+
+        # This is a modified version of https://github.com/kaminari/kaminari/blob/c5186f5d9b7f23299d115408e62047447fd3189d/kaminari-activerecord/lib/kaminari/activerecord/active_record_relation_methods.rb#L17-L41
+        def total_count_with_limit(relation)
+          # #count overrides the #select which could include generated columns referenced in #order, so skip #order here, where it's irrelevant to the result anyway
+          relation = relation.except(:offset, :limit, :order)
+          # Remove includes only if they are irrelevant
+          relation = relation.except(:includes) unless relation.__send__(:references_eager_loaded_tables?)
+          # .group returns an OrderedHash that responds to #count
+          count = relation.limit(TOTAL_COUNT_LIMIT + 1).count(:all)
+          if count.is_a?(Hash) || count.is_a?(ActiveSupport::OrderedHash)
+            count.count
+          elsif count.respond_to?(:count)
+            count.count(:all)
+          else
+            count
+          end
+        end
 
         # rubocop: disable CodeReuse/ActiveRecord
         def add_default_order(relation)
