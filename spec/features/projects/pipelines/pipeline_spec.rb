@@ -477,10 +477,10 @@ describe 'Pipeline', :js do
       end
 
       context 'when accessing failed jobs page' do
-        it 'fails to access the page' do
+        it 'renders a 404 page' do
           subject
 
-          expect(page).to have_title('Access Denied')
+          expect(page).to have_title('Not Found')
         end
       end
     end

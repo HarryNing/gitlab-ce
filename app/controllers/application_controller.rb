@@ -177,11 +177,12 @@ class ApplicationController < ActionController::Base
     # hide existence of the resource, rather tell them they cannot access it using
     # the provided message
     status ||= message.present? ? :forbidden : :not_found
+    template = status == :not_found ? "errors/not_found" : "errors/access_denied"
 
     respond_to do |format|
       format.any { head status }
       format.html do
-        render "errors/access_denied",
+        render template,
                layout: "errors",
                status: status,
                locals: { message: message }
