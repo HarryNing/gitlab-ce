@@ -609,20 +609,29 @@ rollout 100%:
   # multi word variables correctly.
   function create_application_secret() {
     bash -c '
-      prefix="K8S_SECRET_"
-      k8s_variables=$(env | (grep "^${prefix}" || [[ $? == 1 ]]))
+      function extract_prefixed_variables() {
+        prefix="K8S_SECRET_"
+        k8s_variables=$(env | (grep "^${prefix}" || [[ $? == 1 ]]))
 
-      IFS=$(echo -en "\n\b")
-      for k8s_variable in $k8s_variables; do
-        param="${k8s_variable#K8S_SECRET_}"
+        export K8S_VARIABLES=$k8s_variables
+      }
 
-        fromLiteralArgs+=("--from-literal")
-        fromLiteralArgs+=("${param}")
-      done
+      function create_secret() {
+        local IFS=$(echo -en "\n\b")
+        for k8s_variable in $K8S_VARIABLES; do
+          param="${k8s_variable#K8S_SECRET_}"
 
-      kubectl create secret \
-        -n "$KUBE_NAMESPACE" generic "$APPLICATION_SECRET_NAME" ${fromLiteralArgs[@]} -o yaml \
-        --dry-run | kubectl replace -n "$KUBE_NAMESPACE" --force -f -
+          fromLiteralArgs+=("--from-literal")
+          fromLiteralArgs+=("${param}")
+        done
+
+        kubectl create secret \
+          -n "$KUBE_NAMESPACE" generic "$APPLICATION_SECRET_NAME" ${fromLiteralArgs[@]} -o yaml \
+          --dry-run | kubectl replace -n "$KUBE_NAMESPACE" --force -f -
+      }
+
+      extract_prefixed_variables
+      create_secret
     '
   }
 
