@@ -5,7 +5,7 @@
 Releases mark specific points in a project's development history, communicate
 information about the type of change, and deliver on prepared, often compiled,
 versions of the software to be reused elsewhere. Currently, releases can only be
-created through the API.
+created [through the API](../../api/releases.md).
 
 Navigate to **Project > Releases** in order to see the list of releases of a project.
 
