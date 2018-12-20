@@ -23,7 +23,7 @@ GET /projects/:id/releases
 Example request:
 
 ```sh
-curl -H "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/"
+curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/"
 ```
 
 Example response:
@@ -44,7 +44,7 @@ GET /projects/:id/release/:tag_name
 Example request:
 
 ```sh
-curl -H "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/"
+curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/"
 ```
 
 Example response:
@@ -74,7 +74,7 @@ POST /projects/:id/releases
 Example request:
 
 ```sh
-curl -X POST -H "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/"
+curl --request POST --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/"
 ```
 
 Example response:
@@ -120,7 +120,7 @@ PUT /projects/:id/release/:tag_name
 Example request:
 
 ```sh
-curl -X PUT -H "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/"
+curl --request PUT --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/"
 ```
 
 Example response:
@@ -146,7 +146,7 @@ DELETE /projects/:id/release/:tag_name
 Example request:
 
 ```sh
-curl -X DELETE -H "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/"
+curl --request DELETE --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/"
 ```
 
 Example response:
