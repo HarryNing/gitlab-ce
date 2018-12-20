@@ -1,8 +1,8 @@
-# Releases
+# Releases API
 
-> [Introduced][23795] in GitLab 11.7.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/41766) in GitLab 11.7.
 
-A list of the published Releases are available to everyone.
+A list of the published releases are available to everyone.
 
 ## List releases
 
@@ -12,7 +12,19 @@ Paginated list of releases, sorted by `created_at`.
 GET /projects/:id/releases
 ```
 
-## Release by tag name
+| Attribute     | Type           | Required | Description                             |
+| ------------- | -------------- | -------- | --------------------------------------- |
+| `id`          | integer/string | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding). |
+
+Example request:
+
+```sh
+curl -H "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/"
+```
+
+Example response:
+
+## Get a release by a tag name
 
 Get a release for the given tag.
 
@@ -20,25 +32,48 @@ Get a release for the given tag.
 GET /projects/:id/release/:tag_name
 ```
 
+| Attribute     | Type           | Required | Description                             |
+| ------------- | -------------- | -------- | --------------------------------------- |
+| `id`          | integer/string | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding). |
+| `tag_name`    | string         | yes      | The tag where the release will be created from. |
+
+Example request:
+
+```sh
+curl -H "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/"
+```
+
+Example response:
+
+```json
+{
+}
+```
+
 ## Create a release
 
-Users with push access to the repository can create a release.
+Create a release. You need push access to the repository to create a release.
 
 ```
 POST /projects/:id/releases
 ```
 
-
-|Attribute    |Type         |Required     |Description                              |
-|:------------|:------------|:------------|:----------------------------------------|
-|`name`       |string       |yes          |release name                             |
-|`tag_name`   |string       |yes          |the tag where the release will be created|
-|`description`|string       |no           |markdown description of the release      |
-|`ref`        |string       |yes          |if `tag_name` doesn't exist in the repository, the release will be created on `ref`. It can be a commit SHA, another tag name, or branch name |
-|`assets`     |object       |yes          |todo      |
-|`assets`     |array        |yes          |Array with assets links                  |
+| Attribute     | Type           | Required | Description                             |
+| ------------- | -------------- | -------- | --------------------------------------- |
+| `id`          | integer/string | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding). |
+| `name`        | string         | yes      | The release name.                       |
+| `tag_name`    | string         | no       | The tag where the release will be created from. |
+| `description` | string         | no       | The description of the release. You can use [markdown](../user/markdown.md). |
+| `ref`         | string         | yes      | If `tag_name` doesn't exist, the release will be created from `ref`. It can be a commit SHA, another tag name, or a branch name. |
+| `assets`      | array          | yes      | An array with assets links.                  |
 
 Example request:
+
+```sh
+curl -X POST -H "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/"
+```
+
+Example response:
 
 ```json
 {
@@ -63,14 +98,56 @@ Example request:
 
 ## Update a release
 
+Update a release.
+
 ```
 PUT /projects/:id/release/:tag_name
 ```
 
+| Attribute     | Type           | Required | Description                             |
+| ------------- | -------------- | -------- | --------------------------------------- |
+| `id`          | integer/string | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding). |
+| `name`        | string         | yes      | The release name.                       |
+| `tag_name`    | string         | no       | The tag where the release will be created from. |
+| `description` | string         | no       | The description of the release. You can use [markdown](../user/markdown.md). |
+| `ref`         | string         | yes      | If `tag_name` doesn't exist, the release will be created from `ref`. It can be a commit SHA, another tag name, or a branch name. |
+| `assets`      | array          | yes      | An array with assets links.                  |
+
+Example request:
+
+```sh
+curl -X PUT -H "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/"
+```
+
+Example response:
+
+```json
+{
+}
+```
+
 ## Delete a release
 
-Deleting a release will not delete the associated tag.
+Delete a release. Deleting a release will not delete the associated tag.
 
 ```
 DELETE /projects/:id/release/:tag_name
+```
+
+| Attribute     | Type           | Required | Description                             |
+| ------------- | -------------- | -------- | --------------------------------------- |
+| `id`          | integer/string | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding). |
+| `tag_name`    | string         | no       | The tag where the release will be created from. |
+
+Example request:
+
+```sh
+curl -X DELETE -H "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/"
+```
+
+Example response:
+
+```json
+{
+}
 ```
