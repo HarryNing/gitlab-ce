@@ -20,17 +20,30 @@ module Gitlab
 
         yield span
       rescue StandardError => e
-        span.set_tag('error', true)
-        span.log_kv(
-          :event =>          'error',
-          :'error.kind' =>   e.class.to_s,
-          :'error.object' => e,
-          :message =>        e.message,
-          :stack =>          e.backtrace.join("\n")
-        )
-        raise
+        log_exception_on_span(span, e)
+        raise e
       ensure
         scope.close
+      end
+
+      def log_exception_on_span(span, exception)
+        span.set_tag('error', true)
+
+        if exception.is_a? Exception
+          span.log_kv(
+            :event =>          'error',
+            :'error.kind' =>   exception.class.to_s,
+            :'error.object' => exception,
+            :'message' =>      exception.message,
+            :stack =>          exception.backtrace.join("\n")
+          )
+        else
+          span.log_kv(
+            :event =>          'error',
+            :'error.kind' =>   exception.class.to_s,
+            :'error.object' => exception
+          )
+        end
       end
 
       def tags_from_job(job, kind)

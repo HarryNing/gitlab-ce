@@ -49,16 +49,7 @@ module Gitlab
           start_time: start_time,
           tags: tags)
 
-        if exception
-          span.set_tag('error', true)
-          span.log_kv(
-            :event =>          'error',
-            :'error.kind' =>   exception.class.to_s,
-            :'error.object' => exception,
-            :'message' =>      exception.message,
-            :stack =>          exception.backtrace.join("\n")
-          )
-        end
+        log_exception_on_span(span, exception) if exception
 
         span.finish(end_time: end_time)
       end
