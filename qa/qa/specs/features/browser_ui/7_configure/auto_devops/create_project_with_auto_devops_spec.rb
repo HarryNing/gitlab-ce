@@ -30,17 +30,14 @@ module QA
             .join('../../../../../fixtures/auto_devops_rack')
           push.commit_message = 'Create Auto DevOps compatible rack application'
         end
+
+        Page::Project::Show.act { wait_for_push }
       end
 
-      after do
-        @cluster&.remove!
-      end
 
       [true, false].each do |rbac|
         context "when rbac is #{rbac ? 'enabled' : 'disabled'}" do
-          it 'runs auto devops' do
-            Page::Project::Show.act { wait_for_push }
-
+          before(:all) do
             # Create and connect K8s cluster
             @cluster = Service::KubernetesCluster.new(rbac: rbac).create!
             kubernetes_cluster = Resource::KubernetesCluster.fabricate! do |cluster|
@@ -51,6 +48,7 @@ module QA
               cluster.install_prometheus = true
               cluster.install_runner = true
             end
+
             kubernetes_cluster.populate(:ingress_ip)
 
             @project.visit!
@@ -59,7 +57,13 @@ module QA
               p.enable_auto_devops_with_domain(
                 "#{kubernetes_cluster.ingress_ip}.nip.io")
             end
+          end
 
+          after(:all) do
+            @cluster&.remove!
+          end
+
+          it 'runs auto devops' do
             @project.visit!
             Page::Project::Menu.act { click_ci_cd_pipelines }
             Page::Project::Pipeline::Index.act { go_to_latest_pipeline }
@@ -80,55 +84,37 @@ module QA
               end
             end
           end
-        end
-      end
 
-      it 'user sets application secret variable and Auto DevOps passes it to container' do
-        # Set an application secret CI variable (prefixed with K8S_SECRET_)
-        Resource::CiVariable.fabricate! do |resource|
-          resource.project = @project
-          resource.key = 'K8S_SECRET_OPTIONAL_MESSAGE'
-          resource.value = 'You can see this application secret'
-        end
+          it 'user sets application secret variable and Auto DevOps passes it to container' do
+            # Set an application secret CI variable (prefixed with K8S_SECRET_)
+            Resource::CiVariable.fabricate! do |resource|
+              resource.project = @project
+              resource.key = 'K8S_SECRET_OPTIONAL_MESSAGE'
+              resource.value = 'You can see this application secret'
+            end
 
-        # Create and connect K8s cluster
-        @cluster = Service::KubernetesCluster.new(rbac: true).create!
-        kubernetes_cluster = Resource::KubernetesCluster.fabricate! do |cluster|
-          cluster.project = @project
-          cluster.cluster = @cluster
-          cluster.install_helm_tiller = true
-          cluster.install_ingress = true
-          cluster.install_runner = true
-        end
-        kubernetes_cluster.populate(:ingress_ip)
+            @project.visit!
+            Page::Project::Menu.act { click_ci_cd_pipelines }
+            Page::Project::Pipeline::Index.act { go_to_latest_pipeline }
 
-        @project.visit!
-        Page::Project::Menu.act { click_ci_cd_settings }
-        Page::Project::Settings::CICD.perform do |p|
-          p.enable_auto_devops_with_domain(
-            "#{kubernetes_cluster.ingress_ip}.nip.io")
-        end
+            Page::Project::Pipeline::Show.perform do |pipeline|
+              expect(pipeline).to have_build('build', status: :success, wait: 600)
+              expect(pipeline).to have_build('test', status: :success, wait: 600)
+              expect(pipeline).to have_build('production', status: :success, wait: 1200)
+            end
 
-        @project.visit!
-        Page::Project::Menu.act { click_ci_cd_pipelines }
-        Page::Project::Pipeline::Index.act { go_to_latest_pipeline }
+            Page::Project::Menu.act { click_operations_environments }
 
-        Page::Project::Pipeline::Show.perform do |pipeline|
-          expect(pipeline).to have_build('build', status: :success, wait: 600)
-          expect(pipeline).to have_build('test', status: :success, wait: 600)
-          expect(pipeline).to have_build('production', status: :success, wait: 1200)
-        end
+            Page::Project::Operations::Environments::Index.perform do |index|
+              index.go_to_environment('production')
+            end
 
-        Page::Project::Menu.act { click_operations_environments }
-
-        Page::Project::Operations::Environments::Index.perform do |index|
-          index.go_to_environment('production')
-        end
-
-        Page::Project::Operations::Environments::Show.perform do |show|
-          show.view_deployment do
-            expect(page).to have_content('Hello World!')
-            expect(page).to have_content('You can see this application secret')
+            Page::Project::Operations::Environments::Show.perform do |show|
+              show.view_deployment do
+                expect(page).to have_content('Hello World!')
+                expect(page).to have_content('You can see this application secret')
+              end
+            end
           end
         end
       end
