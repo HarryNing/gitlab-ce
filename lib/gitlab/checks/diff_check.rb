@@ -66,8 +66,10 @@ module Gitlab
             commits.each do |commit|
               logger.check_timeout_reached
 
-              commit.raw_deltas.each do |diff|
-                yield(diff)
+              with_cached_validations(commit, commit.id) do
+                commit.raw_deltas.each do |diff|
+                  yield(diff)
+                end
               end
             end
           end
