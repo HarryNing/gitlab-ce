@@ -40,7 +40,7 @@ export default class UserOverviewBlock {
     } else {
       document
         .querySelector(`${this.container} .nothing-here-block`)
-        .classList.add('text-left', 'p-0');
+        .classList.add('p-0');
     }
 
     loadingEl.classList.add('hide');
