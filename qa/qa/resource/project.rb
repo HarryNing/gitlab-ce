@@ -7,12 +7,9 @@ module QA
     class Project < Base
       attribute :name
       attribute :description
-      attribute :group_path
 
       attribute :group do
-        Group.fabricate! do |group|
-          group.path = group_path
-        end
+        Group.fabricate!
       end
 
       attribute :repository_ssh_location do
@@ -29,7 +26,6 @@ module QA
 
       def initialize
         @description = 'My awesome project'
-        @group_path = Runtime::Namespace.name
       end
 
       def name=(raw_name)
