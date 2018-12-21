@@ -141,10 +141,6 @@ module QA
     module Group
       autoload :New, 'qa/page/group/new'
       autoload :Show, 'qa/page/group/show'
-
-      module Settings
-        autoload :Main, 'qa/page/group/settings/main'
-      end
     end
 
     module File
