@@ -7368,12 +7368,6 @@ msgstr ""
 msgid "Users requesting access to"
 msgstr ""
 
-msgid "Variables"
-msgstr ""
-
-msgid "Variables are applied to environments via the runner. They can be protected by only exposing them to protected branches or tags. You can use variables for passwords, secret keys, or credentials."
-msgstr ""
-
 msgid "Various container registry settings."
 msgstr ""
 

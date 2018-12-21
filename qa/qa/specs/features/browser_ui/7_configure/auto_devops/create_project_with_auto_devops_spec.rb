@@ -5,9 +5,13 @@ require 'pathname'
 module QA
   context 'Configure', :orchestrated, :kubernetes do
     describe 'Auto DevOps support' do
-      before(:all) do
+      def login
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.act { sign_in_using_credentials }
+      end
+
+      before(:all) do
+        login
 
         @project = Resource::Project.fabricate! do |p|
           p.name = Runtime::Env.auto_devops_project_name || 'project-with-autodevops'
@@ -33,7 +37,6 @@ module QA
 
         Page::Project::Show.act { wait_for_push }
       end
-
 
       [true, false].each do |rbac|
         context "when rbac is #{rbac ? 'enabled' : 'disabled'}" do
@@ -61,6 +64,10 @@ module QA
 
           after(:all) do
             @cluster&.remove!
+          end
+
+          before do
+            login
           end
 
           it 'runs auto devops' do
