@@ -14,7 +14,6 @@ module Gitlab
         return if deletion? || newrev.nil?
         return unless should_run_diff_validations?
         return if commits.empty?
-        return unless uses_raw_delta_validations?
 
         file_paths = []
         process_raw_deltas do |diff|
@@ -28,17 +27,13 @@ module Gitlab
 
       private
 
-      def should_run_diff_validations?
-        validate_lfs_file_locks?
-      end
-
       def validate_lfs_file_locks?
         strong_memoize(:validate_lfs_file_locks) do
           project.lfs_enabled? && project.any_lfs_file_locks?
         end
       end
 
-      def uses_raw_delta_validations?
+      def should_run_diff_validations?
         validations_for_diff.present? || path_validations.present?
       end
 
