@@ -7,6 +7,8 @@ module Gitlab
     module Redis
       include Common
 
+      MAX_SENT_REDIS_COMMAND_LENGTH = 240
+
       def self.instrument_client
         ::Redis::Client.class_exec do
           prepend RedisTracingInstrumented
@@ -26,12 +28,13 @@ module Gitlab
 
           start_active_span(operation_name: "redis.call",
             tags: {
-              component:      'redis',
-              :'span.kind' => 'client',
-              :'db.host' =>   self.host,
-              :'db.port' =>   self.port,
-              :'redis.db' =>  self.db,
-              :'redis.command' => quantize_redis_arguments(*args)
+              :component =>       'redis',
+              :'span.kind' =>     'client',
+              :'db.host' =>       self.host,
+              :'db.port' =>       self.port,
+              :'redis.db' =>      self.db,
+              :'redis.command' => quantize_redis_arguments(*args),
+              :'redis.args.count' => args.length
             }) do |span|
             super(*args, &block)
           end
@@ -51,8 +54,8 @@ module Gitlab
             str = str.slice(0, 19) + "…" if str.length > 20
 
             memo = memo == "" ? str : memo + " " + str
-            if memo.length > 120
-              memo = memo.slice(0, 119) + "…"
+            if memo.length > MAX_SENT_REDIS_COMMAND_LENGTH
+              memo = memo.slice(0, MAX_SENT_REDIS_COMMAND_LENGTH - 1) + "…"
               # No need to iterate over the rest of the arguments
               break memo
             end
