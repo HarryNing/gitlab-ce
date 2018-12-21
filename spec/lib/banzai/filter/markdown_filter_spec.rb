@@ -32,19 +32,19 @@ describe Banzai::Filter::MarkdownFilter do
       it 'adds language to lang attribute when specified' do
         result = filter("```html\nsome code\n```")
 
-        expect(result).to start_with("<pre><code lang=\"html\">")
+        expect(result).to start_with('<pre data-sourcepos="1:1-3:3"><code lang="html">')
       end
 
       it 'does not add language to lang attribute when not specified' do
         result = filter("```\nsome code\n```")
 
-        expect(result).to start_with("<pre><code>")
+        expect(result).to start_with('<pre data-sourcepos="1:1-3:3"><code>')
       end
 
       it 'works with utf8 chars in language' do
         result = filter("```日\nsome code\n```")
 
-        expect(result).to start_with("<pre><code lang=\"日\">")
+        expect(result).to start_with('<pre data-sourcepos="1:1-3:3"><code lang="日">')
       end
     end
 
@@ -79,7 +79,7 @@ describe Banzai::Filter::MarkdownFilter do
 
       result = filter(text)
 
-      expect(result).to include('<td>foot <sup')
+      expect(result).to include('<td data-sourcepos="3:2-3:12">foot <sup')
       expect(result).to include('<section class="footnotes">')
     end
   end
