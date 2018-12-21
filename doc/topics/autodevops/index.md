@@ -284,20 +284,41 @@ to understand how each one works.
 
 ### Auto Build
 
-Auto Build creates a build of the application in one of two ways:
-
-- If there is a `Dockerfile`, it will use `docker build` to create a Docker image.
-- Otherwise, it will use [Herokuish](https://github.com/gliderlabs/herokuish)
-  and [Heroku buildpacks](https://devcenter.heroku.com/articles/buildpacks)
-  to automatically detect and build the application into a Docker image.
+Auto Build creates a build of the application using an existing `Dockerfile` or
+Heroku buildpacks.
 
 Either way, the resulting Docker image is automatically pushed to the
 [Container Registry][container-registry] and tagged with the commit SHA.
 
-CAUTION: **Important:**
+#### Auto Build using a Dockerfile
+
+If there is a `Dockerfile`, Auto Build will use `docker build` to create a Docker
+image.
+
 If you are also using Auto Review Apps and Auto Deploy and choose to provide
 your own `Dockerfile`, make sure you expose your application to port
 `5000` as this is the port assumed by the default Helm chart.
+
+#### Auto Build using Heroku buildpacks
+
+If a `Dockerfile` isn't present, Auto Build will use
+[Herokuish](https://github.com/gliderlabs/herokuish)
+and [Heroku buildpacks](https://devcenter.heroku.com/articles/buildpacks)
+to automatically detect and build the application into a Docker image.
+
+Each buildpack has his own requirements for auto detection, so your project
+must contain certain language-specific files for Auto Build to work. For
+Python, a `Pipfile` or `requirements.txt` must be present at the
+root of your application's repository. Similarly, the buildpack will detect
+your app as Ruby if it has a `Gemfile` and/or a `Gemfile.lock` file in the
+root directory. For other languages and frameworks, read the
+[buildpacks docs]https://devcenter.heroku.com/articles/buildpacks#officially-supported-buildpacks)
+to see what files your repository must contain for auto-detect to work.
+
+TIP: **Tip:**
+After making sure that the project meets the buildpack requirements and it
+still fails, setting a project variable `TRACE=true` will enable verbose logging
+which may help to troubleshoot.
 
 ### Auto Test
 
