@@ -1098,6 +1098,9 @@ class Repository
   end
 
   def initialize_raw_repository
-    Gitlab::Git::Repository.new(project.repository_storage, disk_path + '.git', Gitlab::GlRepository.gl_repository(project, is_wiki))
+    Gitlab::Git::Repository.new(project.repository_storage,
+                                disk_path + '.git',
+                                Gitlab::GlRepository.gl_repository(project, is_wiki),
+                                project.full_path)
   end
 end
