@@ -34,9 +34,8 @@ module QA
           private
 
           def within_repo_path(full_path)
-
             wait(reload: false) do
-              all_elements(:project_import_row).size > 0
+              all_elements(:project_import_row).!empty?
             end
 
             project_import_row = all_elements(:project_import_row).detect{|row| row.has_css?('a', text: full_path, wait: 1.0)}
@@ -50,9 +49,6 @@ module QA
             within_repo_path(full_path) do
               click_element :project_namespace_select
             end
-
-            require 'pry-byebug'
-            binding.pry
 
             search_and_select(Runtime::Namespace.path)
           end
