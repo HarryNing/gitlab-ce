@@ -24,7 +24,7 @@ module SearchHelper
   end
 
   def search_entries_info(collection, scope, term)
-    return unless collection.to_a.size > 0
+    return if collection.to_a.empty?
 
     from = collection.offset_value + 1
     to = collection.offset_value + collection.to_a.size
