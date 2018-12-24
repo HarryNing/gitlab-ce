@@ -34,7 +34,14 @@ module QA
           private
 
           def within_repo_path(full_path)
-            page.within(%Q(tr[data-qa-repo-path="#{full_path}"])) do
+
+            wait(reload: false) do
+              all_elements(:project_import_row).size > 0
+            end
+
+            project_import_row = all_elements(:project_import_row).detect{|row| row.has_css?('a', text: full_path, wait: 1.0)}
+
+            within(project_import_row) do
               yield
             end
           end
@@ -44,7 +51,10 @@ module QA
               click_element :project_namespace_select
             end
 
-            select_item(Runtime::Namespace.path)
+            require 'pry-byebug'
+            binding.pry
+
+            search_and_select(Runtime::Namespace.path)
           end
 
           def set_path(full_path, name)
